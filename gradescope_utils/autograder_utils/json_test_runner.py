@@ -14,8 +14,8 @@ class JSONTestResult(result.TestResult):
 
     Used by JSONTestRunner.
     """
-    def __init__(self, stream, descriptions, verbosity, results, leaderboard):
-        super(JSONTestResult, self).__init__(stream, descriptions, verbosity)
+    def __init__(self, stream, descriptions, verbosity, buffer, results, leaderboard):
+        super(JSONTestResult, self).__init__(stream, descriptions, verbosity, buffer)
         self.descriptions = descriptions
         self.results = results
         self.leaderboard = leaderboard
@@ -139,7 +139,7 @@ class JSONTestRunner(object):
             self.json_data["stdout_visibility"] = stdout_visibility
 
     def _makeResult(self):
-        return self.resultclass(self.stream, self.descriptions, self.verbosity,
+        return self.resultclass(self.stream, self.descriptions, self.verbosity, self.buffer,
                                 self.json_data["tests"], self.json_data["leaderboard"])
 
     def run(self, test):
