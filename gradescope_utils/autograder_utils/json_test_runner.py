@@ -14,11 +14,13 @@ class JSONTestResult(result.TestResult):
 
     Used by JSONTestRunner.
     """
-    def __init__(self, stream, descriptions, verbosity, buffer, results, leaderboard):
-        super(JSONTestResult, self).__init__(stream, descriptions, verbosity, buffer)
+    def __init__(self, stream, descriptions, verbosity, results, leaderboard):
+        super(JSONTestResult, self).__init__(stream, descriptions, verbosity)
         self.descriptions = descriptions
         self.results = results
         self.leaderboard = leaderboard
+        self.buffer = True
+        self.buffer_output = None
 
     def getDescription(self, test):
         doc_first_line = test.shortDescription()
@@ -49,14 +51,20 @@ class JSONTestResult(result.TestResult):
         super(JSONTestResult, self).startTest(test)
 
     def getOutput(self):
+        out = ""
         if self.buffer:
-            out = self._stdout_buffer.getvalue()
-            err = self._stderr_buffer.getvalue()
-            if err:
+            stdout = self._stdout_buffer.getvalue()
+            stderr = self._stderr_buffer.getvalue()
+            if stderr:
                 if not out.endswith('\n'):
-                    out += '\n'
-                out += err
-            return out
+                    stdout += '\n'
+                out = stdout + stderr
+            elif not stderr and not self.buffer_output:
+                out = stdout
+        else:
+            raise Exception('JSONTestResult.buffer must be True')
+
+        return out
 
     def buildResult(self, test, err=None):
         passed = (err == None)
@@ -116,6 +124,7 @@ class JSONTestResult(result.TestResult):
 
 class JSONTestRunner(object):
     """A test runner class that displays results in JSON form.
+
     """
     resultclass = JSONTestResult
 
@@ -139,7 +148,7 @@ class JSONTestRunner(object):
             self.json_data["stdout_visibility"] = stdout_visibility
 
     def _makeResult(self):
-        return self.resultclass(self.stream, self.descriptions, self.verbosity, self.buffer,
+        return self.resultclass(self.stream, self.descriptions, self.verbosity,
                                 self.json_data["tests"], self.json_data["leaderboard"])
 
     def run(self, test):
@@ -147,7 +156,7 @@ class JSONTestRunner(object):
         result = self._makeResult()
         registerResult(result)
         result.failfast = self.failfast
-        result.buffer = self.buffer
+        result.buffer_output = self.buffer
         startTime = time.time()
         startTestRun = getattr(result, 'startTestRun', None)
         if startTestRun is not None:
