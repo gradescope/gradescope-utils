@@ -14,6 +14,21 @@ class weight(object):
         return func
 
 
+class number(object):
+    """Simple decorator to add a __number__ property to a function
+
+    Usage: @number("1.1")
+
+    This field will then be used to sort the test results on Gradescope.
+    """
+
+    def __init__(self, val):
+        self.val = val
+
+    def __call__(self, func):
+        func.__number__ = self.val
+        return func
+
 class visibility(object):
     """Simple decorator to add a __visibility__ property to a function
 
@@ -22,7 +37,8 @@ class visibility(object):
     Options for the visibility field are as follows:
 
     - `hidden`: test case will never be shown to students
-    - `after_due_date`: test case will be shown after the assignment's due date has passed
+    - `after_due_date`: test case will be shown after the assignment's due date has passed.
+      If late submission is allowed, then test will be shown only after the late due date.
     - `after_published`: test case will be shown only when the assignment is explicitly published from the "Review Grades" page
     - `visible` (default): test case will always be shown
     """
