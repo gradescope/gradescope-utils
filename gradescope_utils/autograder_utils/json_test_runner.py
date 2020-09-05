@@ -1,8 +1,10 @@
 """Running tests"""
 from __future__ import print_function
 
+import os
 import sys
 import time
+import traceback
 import json
 
 from unittest import result
@@ -74,7 +76,31 @@ class JSONTestResult(result.TestResult):
 
         output = self.getOutput()
         if err:
-            output += "Test Failed: {0}\n".format(err[1])
+            # When the error is due to an exception in the user's code,
+            # we provide a stack backtrace so the user is not left wondering
+            # why their code failed.
+            if not isinstance(err[0], AssertionError):
+                # Get formatted traceback and create a string describing the
+                # problem in the user code
+                stackbt = traceback.extract_tb(err[2])
+                # Number of frames of backtrace, can be changed to provide
+                # more detail, but we don't want to go all the way to the
+                # test case.
+                Nframes = 1
+                # gather frame information and create details message
+                msgs = []
+                for frame in range(-Nframes, 0):
+                    # format as:  filename:function line N: program text
+                    msgs.append("%s:%s line %d: %s"%(
+                        os.path.basename(stackbt[frame].filename),
+                        stackbt[frame].name, stackbt[frame].lineno,
+                        stackbt[frame].line))
+                details = "\n"+"\n".join(msgs)
+            else:
+                details = ""
+            # Report error and method/line on which it occurred
+            output += "Test Failed: {}{}\n".format(err[1], details)
+
         result = {
             "name": self.getDescription(test),
             "score": score,
