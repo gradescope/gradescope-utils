@@ -23,7 +23,7 @@ class number(object):
     """
 
     def __init__(self, val):
-        self.val = val
+        self.val = str(val)
 
     def __call__(self, func):
         func.__number__ = self.val
