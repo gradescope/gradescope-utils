@@ -81,7 +81,7 @@ class JSONTestResult(result.TestResult):
             if hide_errors_message:
                 output += hide_errors_message
             else:
-                output += "Test Failed: {0}\n".format(err[1])
+                output += err[1] + '\n' if err[1] else 'Test Failed\n'
         result = {
             "name": self.getDescription(test),
             "score": score,
