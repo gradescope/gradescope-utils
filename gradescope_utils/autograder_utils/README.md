@@ -87,10 +87,10 @@ Gradescope's JSONTestRunner to obtain the JSON output of the Django test cases.
 To enable this, complete the following steps:  
 
 First, in your settings.py, insert the lines:
-```
+```python
 TEST_RUNNER = 'gradescope_utils.autograder_utils.gradescope_django_runner.GradescopeDjangoRunner'
 
-gradescope_parameters = {
+GRADESCOPE_PARAMETERS = {
     'stream': sys.stdout,
     'descriptions': True,
     'verbosity': 1,

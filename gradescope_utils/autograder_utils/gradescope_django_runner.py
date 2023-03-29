@@ -9,12 +9,13 @@ class GradescopeDjangoRunner(DiscoverRunner):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.test_runner = JSONTestRunner
+        self.test_runner = None
 
     def get_gradescope_runner_kwargs(self):
-        return getattr(settings, "gradescope_parameters", {})
+        return getattr(settings, "GRADESCOPE_PARAMETERS", {})
 
     def run_suite(self, suite):
-        kwargs = self.get_test_runner_kwargs()
-        runner = self.test_runner(**kwargs)
-        return runner.run(suite)
+        kwargs = self.get_gradescope_runner_kwargs()
+        self.test_runner = JSONTestRunner(**kwargs)
+        return self.test_runner.run(suite)
+
