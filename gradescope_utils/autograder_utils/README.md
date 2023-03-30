@@ -86,8 +86,7 @@ This allows for an integration between Django testing, which utilizes unittest a
 
 To enable this, complete the following steps:  
 
-The `GRADESCOPE_PARAMETERS` is used to set different arguments for the JSONTestRunner from the default ones:
-In your settings.py, insert the lines below: 
+1. The `GRADESCOPE_PARAMETERS` is used to set different arguments for the JSONTestRunner from the default ones. In your settings.py, insert the lines below: 
 ```python
 TEST_RUNNER = 'gradescope_utils.autograder_utils.gradescope_django_runner.GradescopeDjangoRunner'
 
@@ -104,7 +103,7 @@ GRADESCOPE_PARAMETERS = {
 }
 ```
 
-Then, within your `run_autograder`, run the following command:
+2. You can either pass a file descriptor to `/autograder/results/results.json` as an argument to `'stream'` in the `GRADESCOPE_PARAMETERS`. Alternatively, within your `run_autograder`, run the following command:
 ```
 python3 manage.py test -v 0 > /autograder/results/results.json
 ```
