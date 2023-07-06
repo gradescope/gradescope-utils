@@ -8,8 +8,8 @@ class GradescopeDjangoRunner(DiscoverRunner):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        kwargs = getattr(settings, "GRADESCOPE_PARAMETERS", {})
-        self.test_runner = JSONTestRunner(**kwargs)
+        parameters = getattr(settings, "GRADESCOPE_PARAMETERS", {})
+        self.test_runner = JSONTestRunner(**parameters)
 
     def run_suite(self, suite, **kwargs):
         return self.test_runner.run(suite)
