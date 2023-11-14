@@ -154,11 +154,11 @@ class partial_credit(object):
 class merge_subtests(object):
     """Decorator that merges subtests into a single test case
     
-    Usage: @merge_subtests('True')
+    Usage: @merge_subtests(True)
     """
 
     def __init__(self, val):
-        self.val = str(val)
+        self.val = val
 
     def __call__(self, func):
         func.__merge_subtests__ = self.val

@@ -150,9 +150,14 @@ class JSONTestResult(result.TestResult):
         if outcome == None:
             pass
         else:
-            super(JSONTestResult, self).addFailure(subtest, outcome)
-            self._mirrorOutput = False
-            self.processResult(test, outcome)
+            if self.getMergeSubtests(test):
+                super(JSONTestResult, self).addFailure(subtest, outcome)
+                self._mirrorOutput = False
+                self.processResult(test, outcome)
+            else:
+                super(JSONTestResult, self).addFailure(subtest, outcome)
+                self._mirrorOutput = False
+                self.processResult(subtest, outcome)
 
 
 class JSONTestRunner(object):
@@ -195,6 +200,13 @@ class JSONTestRunner(object):
         return self.resultclass(self.stream, self.descriptions, self.verbosity,
                                 self.json_data["tests"], self.json_data["leaderboard"],
                                 self.failure_prefix)
+    
+    def _checkMergeSubtests(self, list_of_dicts, key):
+        "Check if subtests should be merged."
+        for dict in list_of_dicts:
+            if key in dict:
+                return True
+        return False
 
     def run(self, test):
         "Run the given test case or test suite."
@@ -225,23 +237,21 @@ class JSONTestRunner(object):
         if self.post_processor is not None:
             self.post_processor(self.json_data)
 
-        
-        try:
-            if len(self.json_data["tests"]) > 1:
+        if self._checkMergeSubtests(self.json_data["tests"], "merge_subtests"):
+            merged_dict = {}
 
-                i = 0
-                while i < len(self.json_data["tests"]):
-                    if (self.json_data["tests"][i]["name"] == self.json_data["tests"][i+1]["name"]
-                        and self.json_data["tests"][i]["merge_subtests"] == 'True'):
-                        self.json_data["tests"][i]["output"] += self.json_data["tests"][i+1]["output"]
-                        del self.json_data["tests"][i+1]
+            for test in self.json_data["tests"]:
+                if test["merge_subtests"]:
+                    if test["name"] in merged_dict:
+                        merged_dict[test["name"]]["output"] += test["output"]
                     else:
-                        i += 1
-                        if i + 1 >= len(self.json_data["tests"]):
-                            break
-        except KeyError:
-            pass
-            
+                        merged_dict[test["name"]] = test
+                
+                else:
+                    merged_dict[test["name"]] = test
+                
+            self.json_data["tests"] = list(merged_dict.values())
+
         json.dump(self.json_data, self.stream, indent=4)
         self.stream.write('\n')
 
