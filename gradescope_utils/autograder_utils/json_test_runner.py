@@ -238,34 +238,26 @@ class JSONTestRunner(object):
             self.post_processor(self.json_data)
 
         if self._checkMergeSubtests(self.json_data["tests"], "merge_subtests"):
-            list_of_tests = []
 
-            print(1)
-            
-            for test in self.json_data["tests"]:
-                print(2)
-                try:
-                    print(3)
-                    if test["merge_subtests"]:
-                        print(4)
-                        for dict in list_of_tests:
-                            print(5)
-                            if test["name"] in dict:
-                                print(6)
-                                dict[test["name"]]["output"] += test["output"]
-                            else:
-                                print(7)
-                                list_of_tests.append(test)               
-                    else:
-                        print(8)
-                        list_of_tests.append(test)
+            try:
+                if len(self.json_data["tests"]) > 1:
 
-                except KeyError:
-                    print(9)
-                    list_of_tests.append(test)
-            print(10)
-            self.json_data["tests"] = list_of_tests
-        print(11)
+                    i = 0
+                    while i < len(self.json_data["tests"]):
+                        
+                        if (self.json_data["tests"][i]["name"] == self.json_data["tests"][i+1]["name"]
+                            and self.json_data["tests"][i]["merge_subtests"] == 'True'):
+                            self.json_data["tests"][i]["output"] += self.json_data["tests"][i+1]["output"]
+                            del self.json_data["tests"][i+1]
+
+                        else:
+                            i += 1
+                            if i + 1 >= len(self.json_data["tests"]):
+                                break
+
+            except KeyError:
+                pass
+
         json.dump(self.json_data, self.stream, indent=4)
         self.stream.write('\n')
 
