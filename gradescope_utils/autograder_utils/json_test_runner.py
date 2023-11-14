@@ -254,6 +254,8 @@ class JSONTestRunner(object):
                 except KeyError:
                     list_of_tests.append(test)
 
+            self.json_data["tests"] = list_of_tests
+
         json.dump(self.json_data, self.stream, indent=4)
         self.stream.write('\n')
 
