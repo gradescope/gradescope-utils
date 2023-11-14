@@ -246,7 +246,7 @@ class JSONTestRunner(object):
                     while i < len(self.json_data["tests"]):
                         
                         if (self.json_data["tests"][i]["name"] == self.json_data["tests"][i+1]["name"]
-                            and self.json_data["tests"][i]["merge_subtests"] == 'True'):
+                            and self.json_data["tests"][i]["merge_subtests"]):
                             self.json_data["tests"][i]["output"] += self.json_data["tests"][i+1]["output"]
                             del self.json_data["tests"][i+1]
 
