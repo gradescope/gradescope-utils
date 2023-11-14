@@ -200,6 +200,13 @@ class JSONTestRunner(object):
         return self.resultclass(self.stream, self.descriptions, self.verbosity,
                                 self.json_data["tests"], self.json_data["leaderboard"],
                                 self.failure_prefix)
+    
+    def _checkMergeSubtests(self, list_of_dicts, key):
+        "Check if subtests should be merged."
+        for dict in list_of_dicts:
+            if key in dict:
+                return True
+        return False
 
     def run(self, test):
         "Run the given test case or test suite."
@@ -230,14 +237,14 @@ class JSONTestRunner(object):
         if self.post_processor is not None:
             self.post_processor(self.json_data)
 
-        try:
-            if len(self.json_data["tests"]) > 1:
-
-                i = 0
-                while i < len(self.json_data["tests"]):
-                    
+        if self._checkMergeSubtests(self.json_data["tests"], "merge_subtests"):
+            
+            i = 0
+            while i < len(self.json_data["tests"]):
+                
+                try:
                     if (self.json_data["tests"][i]["name"] == self.json_data["tests"][i+1]["name"]
-                        and self.json_data["tests"][i]["merge_subtests"] == True):
+                        and self.json_data["tests"][i]["merge_subtests"]):
                         self.json_data["tests"][i]["output"] += self.json_data["tests"][i+1]["output"]
                         del self.json_data["tests"][i+1]
 
@@ -245,9 +252,11 @@ class JSONTestRunner(object):
                         i += 1
                         if i + 1 >= len(self.json_data["tests"]):
                             break
-
-        except KeyError:
-            pass
+                
+                except KeyError:
+                    i += 1
+                    if i + 1 >= len(self.json_data["tests"]):
+                        break
 
         json.dump(self.json_data, self.stream, indent=4)
         self.stream.write('\n')
