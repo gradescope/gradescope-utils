@@ -200,13 +200,6 @@ class JSONTestRunner(object):
         return self.resultclass(self.stream, self.descriptions, self.verbosity,
                                 self.json_data["tests"], self.json_data["leaderboard"],
                                 self.failure_prefix)
-    
-    def _checkMergeSubtests(self, list_of_dicts, key):
-        "Check if subtests should be merged."
-        for dict in list_of_dicts:
-            if key in dict:
-                return True
-        return False
 
     def run(self, test):
         "Run the given test case or test suite."
@@ -244,7 +237,7 @@ class JSONTestRunner(object):
                 while i < len(self.json_data["tests"]):
                     
                     if (self.json_data["tests"][i]["name"] == self.json_data["tests"][i+1]["name"]
-                        and self.json_data["tests"][i]["merge_subtests"]):
+                        and self.json_data["tests"][i]["merge_subtests"] == True):
                         self.json_data["tests"][i]["output"] += self.json_data["tests"][i+1]["output"]
                         del self.json_data["tests"][i+1]
 
