@@ -241,13 +241,13 @@ class JSONTestRunner(object):
             merged_dict = {}
 
             for test in self.json_data["tests"]:
-                if test["merge_subtests"]:
-                    if test["name"] in merged_dict:
+                try: 
+                    if test["name"] in merged_dict and test["merge_subtests"]:
                         merged_dict[test["name"]]["output"] += test["output"]
                     else:
                         merged_dict[test["name"]] = test
                 
-                else:
+                except KeyError:
                     merged_dict[test["name"]] = test
                 
             self.json_data["tests"] = list(merged_dict.values())
