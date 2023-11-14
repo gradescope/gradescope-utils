@@ -238,19 +238,17 @@ class JSONTestRunner(object):
             self.post_processor(self.json_data)
 
         if self._checkMergeSubtests(self.json_data["tests"], "merge_subtests"):
-            merged_dict = {}
-
+            list_of_tests = []
+            
             for test in self.json_data["tests"]:
                 if test["merge_subtests"]:
-                    if test["name"] in merged_dict:
-                        merged_dict[test["name"]]["output"] += test["output"]
-                    else:
-                        merged_dict[test["name"]] = test
-                
+                    for dict in list_of_tests:
+                        if test["name"] in dict:
+                            dict[test["name"]]["output"] += test["output"]
+                        else:
+                            list_of_tests.append(test)               
                 else:
-                    merged_dict[test["name"]] = test
-                
-            self.json_data["tests"] = list(merged_dict.values())
+                    list_of_tests.append(test)
 
         json.dump(self.json_data, self.stream, indent=4)
         self.stream.write('\n')
