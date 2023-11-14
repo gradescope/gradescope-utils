@@ -241,13 +241,17 @@ class JSONTestRunner(object):
             list_of_tests = []
             
             for test in self.json_data["tests"]:
-                if test["merge_subtests"]:
-                    for dict in list_of_tests:
-                        if test["name"] in dict:
-                            dict[test["name"]]["output"] += test["output"]
-                        else:
-                            list_of_tests.append(test)               
-                else:
+                try:
+                    if test["merge_subtests"]:
+                        for dict in list_of_tests:
+                            if test["name"] in dict:
+                                dict[test["name"]]["output"] += test["output"]
+                            else:
+                                list_of_tests.append(test)               
+                    else:
+                        list_of_tests.append(test)
+
+                except KeyError:
                     list_of_tests.append(test)
 
         json.dump(self.json_data, self.stream, indent=4)
