@@ -29,28 +29,69 @@ class JSONTestResult(result.TestResult):
         else:
             return str(test)
 
+    def getTestMethodName(self, test):
+        if "_testMethodName" not in vars(test):
+            return None
+
+        return getattr(test, test._testMethodName)
+
     def getTags(self, test):
-        return getattr(getattr(test, test._testMethodName), '__tags__', None)
+        testMethodName = self.getTestMethodName(test)
+
+        if not testMethodName:
+            return None
+
+        return getattr(testMethodName, '__tags__', None)
 
     def getWeight(self, test):
-        return getattr(getattr(test, test._testMethodName), '__weight__', None)
+        testMethodName = self.getTestMethodName(test)
+
+        if not testMethodName:
+            return None
+
+        return getattr(testMethodName, '__weight__', None)
 
     def getScore(self, test):
-        return getattr(getattr(test, test._testMethodName), '__score__', None)
+        testMethodName = self.getTestMethodName(test)
+
+        if not testMethodName:
+            return None
+
+        return getattr(testMethodName, '__score__', None)
 
     def getNumber(self, test):
-        return getattr(getattr(test, test._testMethodName), '__number__', None)
+        testMethodName = self.getTestMethodName(test)
+
+        if not testMethodName:
+            return None
+
+        return getattr(testMethodName, '__number__', None)
 
     def getVisibility(self, test):
-        return getattr(getattr(test, test._testMethodName), '__visibility__', None)
+        testMethodName = self.getTestMethodName(test)
+
+        if not testMethodName:
+            return None
+
+        return getattr(testMethodName, '__visibility__', None)
 
     def getHideErrors(self, test):
-        return getattr(getattr(test, test._testMethodName), '__hide_errors__', None)
+        testMethodName = self.getTestMethodName(test)
+
+        if not testMethodName:
+            return None
+
+        return getattr(testMethodName, '__hide_errors__', None)
 
     def getLeaderboardData(self, test):
-        column_name = getattr(getattr(test, test._testMethodName), '__leaderboard_column__', None)
-        sort_order = getattr(getattr(test, test._testMethodName), '__leaderboard_sort_order__', None)
-        value = getattr(getattr(test, test._testMethodName), '__leaderboard_value__', None)
+        testMethodName = self.getTestMethodName(test)
+
+        if not testMethodName:
+            return (None, None, None)
+
+        column_name = getattr(testMethodName, '__leaderboard_column__', None)
+        sort_order = getattr(testMethodName, '__leaderboard_sort_order__', None)
+        value = getattr(testMethodName, '__leaderboard_value__', None)
         return (column_name, sort_order, value)
 
     def startTest(self, test):
