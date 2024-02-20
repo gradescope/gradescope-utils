@@ -1,4 +1,21 @@
-from functools import wraps
+from functools import wraps, update_wrapper
+import signal
+
+
+class _update_wrapper_after_call(object):
+    """Context manager to update a wrapper function after the wrapped function is called. Thus,
+    if the wrapped function modifies the wrapper state (as in @partial_credit, for example), any
+    changes to the wrapper will be preserved.
+    """
+    def __init__(self, wrapper, func):
+        self.wrapper = wrapper
+        self.func = func
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        update_wrapper(self.wrapper, self.func)
 
 
 class weight(object):
@@ -112,7 +129,8 @@ class leaderboard(object):
         @wraps(func)
         def wrapper(*args, **kwargs):
             kwargs['set_leaderboard_value'] = set_leaderboard_value
-            return func(*args, **kwargs)
+            with _update_wrapper_after_call(wrapper, func):
+                return func(*args, **kwargs)
 
         return wrapper
 
@@ -146,6 +164,7 @@ class partial_credit(object):
         @wraps(func)
         def wrapper(*args, **kwargs):
             kwargs['set_score'] = set_score
-            return func(*args, **kwargs)
+            with _update_wrapper_after_call(wrapper, func):
+                return func(*args, **kwargs)
 
         return wrapper
