@@ -82,16 +82,30 @@ Example output:
 ```
 
 ### GradescopeDjangoRunner
-This allows for an integration between Django testing, which utilizes unittest and 
-Gradescope's JSONTestRunner to obtain the JSON output of the Django test cases. 
+This allows for an integration between Django testing, which utilizes unittest and Gradescope's JSONTestRunner to obtain the JSON output of the Django test cases. 
+
 To enable this, complete the following steps:  
 
-First, in your settings.py, insert the line:
-```
-`TEST_RUNNER = 'gradescope_utils.autograder_utils.gradescope_django_runner.GradescopeDjangoRunner'`
+* The `GRADESCOPE_PARAMETERS` is used to set different arguments for the JSONTestRunner from the default ones. In your settings.py, insert the lines below: 
+```python
+import sys
+
+TEST_RUNNER = 'gradescope_utils.autograder_utils.gradescope_django_runner.GradescopeDjangoRunner'
+
+GRADESCOPE_PARAMETERS = {
+    'stream': sys.stdout,
+    'descriptions': True,
+    'verbosity': 1,
+    'failfast': False,
+    'buffer': True,
+    'visibility': "visible",
+    'stdout_visibility': None,
+    'post_processor': None,
+    'failure_prefix': "Test Failed: "
+}
 ```
 
-Then, within your `run_autograder`, run the following command:
+* You can either pass a file descriptor to `/autograder/results/results.json` as an argument to `'stream'` in the `GRADESCOPE_PARAMETERS`. Alternatively, within your `run_autograder`, run the following command:
 ```
 python3 manage.py test -v 0 > /autograder/results/results.json
 ```

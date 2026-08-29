@@ -1,6 +1,6 @@
-import sys
-from django.test.runner import DiscoverRunner
 from gradescope_utils.autograder_utils.json_test_runner import JSONTestRunner
+from django.test.runner import DiscoverRunner
+from django.conf import settings
 
 
 class GradescopeDjangoRunner(DiscoverRunner):
@@ -8,6 +8,8 @@ class GradescopeDjangoRunner(DiscoverRunner):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        parameters = getattr(settings, "GRADESCOPE_PARAMETERS", {})
+        self.test_runner = JSONTestRunner(**parameters)
 
     def run_suite(self, suite, **kwargs):
-        return JSONTestRunner(**kwargs).run(suite)
+        return self.test_runner.run(suite)
